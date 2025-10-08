@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Simple Alarm",
   "version": "1.0.0",
-  "description": "One-shot reminders with date and time. No server required.",
+  "description": "One-shot reminders with date and time.",
   "permissions": [
     "alarms",
     "notifications",
