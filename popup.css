@@ -71,7 +71,6 @@ html,
 body {
     width: 400px;
     height: 700px;
-    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
     "Droid Sans", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -91,7 +90,6 @@ body {
     display: flex;
     flex-direction: column;
     background: var(--color-bg-primary);
-    overflow-y: scroll;
 }
 
 /* Custom scrollbar for WebKit browsers */

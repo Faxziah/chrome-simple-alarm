@@ -286,7 +286,7 @@ function onEditEvent(id) {
   cancelBtn.style.display = 'inline-block';
   
   // Scroll to form
-  document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+  document.querySelector('body').scrollIntoView({ behavior: 'smooth' });
 }
 
 async function onDeleteEvent(id) {
