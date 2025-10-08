@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderEvents();
   setMinDateTime();
   setupMessageListener();
+  // Pre-fill default title on initial open if empty
+  if (!titleInput.value) {
+    titleInput.value = getNextAlarmTitle();
+  }
 });
 
 // Event listeners
@@ -173,7 +177,7 @@ function cancelEdit() {
 
 function resetForm() {
   currentEditingId = null;
-  titleInput.value = '';
+  titleInput.value = getNextAlarmTitle();
   dateInput.value = '';
   timeInput.value = '';
   saveBtn.textContent = 'Save Reminder';
@@ -286,7 +290,12 @@ function onEditEvent(id) {
 }
 
 async function onDeleteEvent(id) {
-  if (!confirm('Are you sure you want to delete this reminder?')) return;
+  const target = events.find(e => e.id === id);
+  if (!target) return;
+  // Ask confirmation only for pending items; delete completed immediately
+  if (target.status === 'pending') {
+    if (!confirm('Are you sure you want to delete this reminder?')) return;
+  }
   
   // Remove from events array
   events = events.filter(e => e.id !== id);
@@ -320,6 +329,17 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Compute next default title like "Alarm 1", "Alarm 2", ... unique among pending
+function getNextAlarmTitle() {
+  const base = 'Alarm';
+  const pendingTitles = new Set(
+    events.filter(e => e.status === 'pending').map(e => (e.title || '').trim())
+  );
+  let n = 1;
+  while (pendingTitles.has(`${base} ${n}`)) n += 1;
+  return `${base} ${n}`;
 }
 
 // Message listener for custom alarm sound
