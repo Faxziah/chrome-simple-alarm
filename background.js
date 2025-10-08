@@ -94,6 +94,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   
   // 2. Show notification
   showNotification(event);
+
+  // 3. Sweep any other pending events that are overdue and move them to completed
+  await sweepOverduePending(event.id);
 });
 
 chrome.notifications.onClicked.addListener(async (notificationId) => {
@@ -128,6 +131,19 @@ async function handleStartup() {
       // Event is in the future - schedule alarm
       scheduleAlarm(event.id, event.whenMs);
     }
+  }
+}
+
+// Sweep helper: complete and notify all pending events already in the past
+async function sweepOverduePending(excludeId) {
+  const now = Date.now();
+  const all = await getEvents();
+  for (const e of all) {
+    if (e.id === excludeId) continue;
+    if (e.status !== 'pending') continue;
+    if (e.whenMs > now) continue;
+    await updateEventStatus(e.id, 'completed', now);
+    showNotification(e);
   }
 }
 

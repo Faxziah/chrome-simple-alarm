@@ -65,7 +65,7 @@ header h1 {
 .tab-content {
   display: none;
   padding: 16px;
-  width: 300px;
+  width: 320px;
 }
 
 .tab-content.active {
@@ -117,6 +117,7 @@ header h1 {
   display: flex;
   gap: 8px;
   margin-top: 16px;
+  justify-content: space-between;
 }
 
 button {
