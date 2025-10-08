@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupEventListeners();
   renderEvents();
   setMinDateTime();
+  setupMessageListener();
 });
 
 // Event listeners
@@ -321,4 +322,97 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// No global exposure needed; using event delegation for CSP compliance
+// Message listener for custom alarm sound
+function setupMessageListener() {
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'playAlarmSound') {
+      playCustomAlarmSound(request.eventTitle);
+    }
+  });
+}
+
+// Play custom alarm sound using Web Audio API
+function playCustomAlarmSound(eventTitle) {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Create a more complex alarm sound
+    const oscillator1 = audioContext.createOscillator();
+    const oscillator2 = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator1.connect(gainNode);
+    oscillator2.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // First beep: 800Hz -> 1000Hz -> 800Hz
+    oscillator1.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator1.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+    oscillator1.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+    
+    // Second beep: 600Hz -> 1200Hz -> 600Hz
+    oscillator2.frequency.setValueAtTime(600, audioContext.currentTime + 0.3);
+    oscillator2.frequency.setValueAtTime(1200, audioContext.currentTime + 0.4);
+    oscillator2.frequency.setValueAtTime(600, audioContext.currentTime + 0.5);
+    
+    // Volume envelope
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.35);
+    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+    
+    oscillator1.start(audioContext.currentTime);
+    oscillator1.stop(audioContext.currentTime + 0.2);
+    
+    oscillator2.start(audioContext.currentTime + 0.3);
+    oscillator2.stop(audioContext.currentTime + 0.5);
+    
+    // Show visual feedback
+    showAlarmVisualFeedback(eventTitle);
+    
+  } catch (error) {
+    console.log('Could not play custom alarm sound:', error);
+  }
+}
+
+// Show visual feedback for alarm
+function showAlarmVisualFeedback(eventTitle) {
+  // Create a temporary visual indicator
+  const indicator = document.createElement('div');
+  indicator.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff4444;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 10000;
+    animation: pulse 0.5s ease-in-out 3;
+  `;
+  indicator.textContent = `🔔 ${eventTitle}`;
+  
+  // Add pulse animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  document.body.appendChild(indicator);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (indicator.parentNode) {
+      indicator.parentNode.removeChild(indicator);
+    }
+    if (style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }, 3000);
+}

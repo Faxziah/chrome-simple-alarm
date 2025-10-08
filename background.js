@@ -64,7 +64,23 @@ function showNotification(event) {
     message: message,
     requireInteraction: true,
     priority: 2,
-    silent: false
+    silent: true
+  });
+  
+  // Ensure offscreen document exists and ask it to play sound
+  ensureOffscreenDocument().then(() => {
+    chrome.runtime.sendMessage({ action: 'offscreen-play-sound' });
+  }).catch(() => {});
+}
+
+// Offscreen document helper
+async function ensureOffscreenDocument() {
+  const existing = await chrome.offscreen.hasDocument?.();
+  if (existing) return;
+  await chrome.offscreen.createDocument({
+    url: 'offscreen.html',
+    reasons: ['AUDIO_PLAYBACK'],
+    justification: 'Play alarm sound when alarm fires'
   });
 }
 
