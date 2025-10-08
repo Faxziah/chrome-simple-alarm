@@ -1,260 +1,467 @@
-/* Simple Alarm Extension - Popup Styles */
+/* ===========================
+   CSS Custom Properties
+   =========================== */
+:root {
+    /* Colors */
+    --color-primary: #667eea;
+    --color-primary-dark: #5568d3;
+    --color-secondary: #764ba2;
+    --color-danger: #dc3545;
+    --color-danger-dark: #c82333;
 
+    /* Neutrals */
+    --color-text-primary: #212529;
+    --color-text-secondary: #495057;
+    --color-text-muted: #6c757d;
+    --color-text-light: #adb5bd;
+
+    /* Backgrounds */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f8f9fa;
+    --color-bg-tertiary: #e9ecef;
+
+    /* Borders */
+    --color-border-light: #e9ecef;
+    --color-border-medium: #dee2e6;
+    --color-border-dark: #ced4da;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 20px;
+    --spacing-2xl: 24px;
+    --spacing-3xl: 48px;
+
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    /* Transitions */
+    --transition-fast: all 0.2s ease;
+
+    /* Typography */
+    --font-size-xs: 13px;
+    --font-size-sm: 14px;
+    --font-size-md: 15px;
+    --font-size-lg: 16px;
+    --font-size-xl: 24px;
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+}
+
+/* ===========================
+   Reset & Base Styles
+   =========================== */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+html,
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #333;
-  background: #fff;
+    width: 400px;
+    height: 700px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
 }
 
+/* ===========================
+   Container
+   =========================== */
 .container {
-  width: 600px;
-  height: 600px;
-  overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-primary);
+    overflow-y: scroll;
 }
 
+/* Custom scrollbar for WebKit browsers */
+.container::-webkit-scrollbar,
+.form-section::-webkit-scrollbar,
+.events-list::-webkit-scrollbar {
+    width: var(--spacing-sm);
+}
+
+.container::-webkit-scrollbar-track,
+.form-section::-webkit-scrollbar-track,
+.events-list::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+}
+
+.container::-webkit-scrollbar-thumb,
+.form-section::-webkit-scrollbar-thumb,
+.events-list::-webkit-scrollbar-thumb {
+    background: var(--color-border-dark);
+    border-radius: var(--radius-sm);
+}
+
+.container::-webkit-scrollbar-thumb:hover,
+.form-section::-webkit-scrollbar-thumb:hover,
+.events-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-light);
+}
+
+/* ===========================
+   Header
+   =========================== */
 header {
-  background: #4285f4;
-  color: white;
-  padding: 16px;
-  text-align: center;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 header h1 {
-  font-size: 18px;
-  font-weight: 500;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
 }
 
-/* Tab Navigation */
+header .subtitle {
+    font-size: var(--font-size-xs);
+    opacity: 0.9;
+    font-weight: var(--font-weight-normal);
+}
+
+/* ===========================
+   Tabs Navigation
+   =========================== */
 .tabs {
-  display: flex;
-  background: #f5f5f5;
-  border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    background: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 .tab-button {
-  flex: 1;
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  transition: all 0.2s;
+    flex: 1;
+    padding: 10px var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: var(--transition-fast);
 }
 
 .tab-button:hover {
-  background: #e8e8e8;
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-text-light);
+}
+
+.tab-button:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 .tab-button.active {
-  background: #fff;
-  color: #4285f4;
-  border-bottom: 2px solid #4285f4;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-bg-primary);
 }
 
-/* Tab Content */
+/* ===========================
+   Tab Content
+   =========================== */
 .tab-content {
-  display: none;
-  padding: 16px;
-  width: 320px;
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 .tab-content.active {
-  display: block;
+    display: flex;
 }
 
-/* Form Styles */
+/* ===========================
+   Form Section
+   =========================== */
 .form-section {
-  margin-bottom: 24px;
-  padding: 16px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  overflow-y: scroll;
+    padding: var(--spacing-lg);
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border-light);
+    overflow-y: scroll;
 }
 
 .form-section h2 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: #333;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+#event-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
 }
 
 .form-group {
-  margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 4px;
-  font-weight: 500;
-  color: #555;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
 }
 
 .form-group input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.2s;
+    padding: 10px var(--spacing-md);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    background: var(--color-bg-primary);
+    transition: var(--transition-fast);
 }
 
 .form-group input:focus {
-  outline: none;
-  border-color: #4285f4;
-  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-group input::placeholder {
+    color: var(--color-text-light);
+}
+
+.form-row {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* ===========================
+   Form Actions
+   =========================== */
 .form-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-  justify-content: space-between;
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xs);
 }
 
-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+.form-actions button {
+    flex: 1;
+    padding: 10px var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: var(--transition-fast);
 }
 
-button[type="submit"] {
-  background: #4285f4;
-  color: white;
+#save-btn {
+    background: var(--color-primary);
+    color: var(--color-bg-primary);
 }
 
-button[type="submit"]:hover {
-  background: #3367d6;
+#save-btn:hover {
+    background: var(--color-primary-dark);
 }
 
-button[type="button"] {
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #ddd;
+#save-btn:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
-button[type="button"]:hover {
-  background: #e8e8e8;
+#cancel-btn {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
 }
 
-/* Events Section */
+#cancel-btn:hover {
+    background: var(--color-border-medium);
+}
+
+#cancel-btn:focus {
+    outline: 2px solid var(--color-text-light);
+    outline-offset: 2px;
+}
+
+/* ===========================
+   Events Section
+   =========================== */
+.events-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    overflow: hidden;
+}
+
 .events-section h2 {
-  font-size: 16px;
-  margin-bottom: 12px;
-  color: #333;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-lg);
 }
 
 .events-list {
-  overflow-y: scroll;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    overflow-y: scroll;
+    padding-right: var(--spacing-xs);
 }
 
+/* ===========================
+   Event Item (populated by JS)
+   =========================== */
 .event-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  margin-bottom: 8px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-fast);
 }
 
 .event-item:hover {
-  border-color: #4285f4;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-medium);
 }
 
 .event-info {
-  flex: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
 }
 
 .event-title {
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #333;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
 }
 
 .event-time {
-  font-size: 12px;
-  color: #666;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
 }
 
 .event-actions {
-  display: flex;
-  gap: 4px;
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
 }
 
-.btn-edit, .btn-delete {
-  padding: 4px 8px;
-  border: none;
-  border-radius: 3px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
+.event-actions button {
+    padding: 6px var(--spacing-md);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    background: var(--color-bg-primary);
+    color: var(--color-text-secondary);
+    min-width: 60px;
 }
 
-.btn-edit {
-  background: #f0f0f0;
-  color: #666;
+.event-actions button:hover {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-text-light);
 }
 
-.btn-edit:hover {
-  background: #e0e0e0;
+.event-actions button:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
-.btn-delete {
-  background: #f44336;
-  color: white;
+.event-actions .btn-edit {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 
-.btn-delete:hover {
-  background: #d32f2f;
+.event-actions .btn-edit:hover {
+    background: var(--color-primary);
+    color: var(--color-bg-primary);
 }
 
-/* Empty State */
+.event-actions .btn-delete {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.event-actions .btn-delete:hover {
+    background: var(--color-danger);
+    color: var(--color-bg-primary);
+}
+
+/* ===========================
+   Empty State
+   =========================== */
 .empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-3xl) var(--spacing-2xl);
+    text-align: center;
+    color: var(--color-text-muted);
 }
 
-.empty-state h3 {
-  font-size: 16px;
-  margin-bottom: 8px;
-  color: #999;
+.empty-icon {
+    font-size: var(--spacing-3xl);
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.5;
 }
 
 .empty-state p {
-  font-size: 14px;
-  color: #aaa;
+    font-size: var(--font-size-md);
+    margin-bottom: var(--spacing-xs);
 }
 
-/* Responsive */
-@media (max-width: 400px) {
-  .container {
-    width: 100%;
-  }
-  
-  .event-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .event-actions {
-    margin-top: 8px;
-    align-self: flex-end;
-  }
+.empty-hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-light);
+}
+
+/* ===========================
+   Accessibility
+   =========================== */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Ensure adequate click targets */
+button,
+input {
+    min-height: 40px;
 }
