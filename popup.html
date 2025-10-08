@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Alarm</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Simple Alarm</h1>
+    </header>
+    
+    <!-- Tab Navigation -->
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="pending">Pending</button>
+      <button class="tab-button" data-tab="completed">Completed</button>
+    </nav>
+    
+    <!-- Pending Tab -->
+    <div class="tab-content active" id="pending-tab">
+      <!-- Add New Event Form -->
+      <div class="form-section">
+        <h2>Add New Reminder</h2>
+        <form id="event-form">
+          <div class="form-group">
+            <label for="event-title">Title:</label>
+            <input type="text" id="event-title" placeholder="Enter reminder title" maxlength="140" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="event-date">Date:</label>
+            <input type="date" id="event-date" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="event-time">Time:</label>
+            <input type="time" id="event-time" required>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" id="save-btn">Save Reminder</button>
+            <button type="button" id="cancel-btn" style="display: none;">Cancel</button>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Pending Events List -->
+      <div class="events-section">
+        <h2>Pending Reminders</h2>
+        <div id="pending-events" class="events-list">
+          <!-- Events will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- Completed Tab -->
+    <div class="tab-content" id="completed-tab">
+      <div class="events-section">
+        <h2>Completed Reminders</h2>
+        <div id="completed-events" class="events-list">
+          <!-- Events will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
