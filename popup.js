@@ -2,7 +2,6 @@
 // Handles UI interactions, CRUD operations, and validation
 
 const EVENTS_KEY = "events";
-const MIN_LEAD_TIME_MS = 60 * 1000; // 1 minute
 
 let currentEditingId = null;
 let events = [];
@@ -45,6 +44,30 @@ function setupEventListeners() {
     button.addEventListener('click', (e) => {
       switchTab(e.target.dataset.tab);
     });
+  });
+
+  // Delegated clicks for Pending list (Edit/Delete)
+  pendingEventsList.addEventListener('click', (e) => {
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+    const action = actionBtn.getAttribute('data-action');
+    const id = actionBtn.getAttribute('data-id');
+    if (action === 'edit') {
+      onEditEvent(id);
+    } else if (action === 'delete') {
+      onDeleteEvent(id);
+    }
+  });
+
+  // Delegated clicks for Completed list (Delete only)
+  completedEventsList.addEventListener('click', (e) => {
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+    const action = actionBtn.getAttribute('data-action');
+    const id = actionBtn.getAttribute('data-id');
+    if (action === 'delete') {
+      onDeleteEvent(id);
+    }
   });
 }
 
@@ -104,8 +127,8 @@ function handleFormSubmit(e) {
   const whenMs = new Date(`${date}T${time}`).getTime();
   const now = Date.now();
   
-  if (whenMs < now + MIN_LEAD_TIME_MS) {
-    alert('Please select a time at least 1 minute in the future');
+  if (whenMs <= now) {
+    alert('Please select a time in the future');
     return;
   }
   
@@ -166,7 +189,7 @@ function setMinDateTime() {
   timeInput.min = minTime;
   
   // Set default to 1 minute from now
-  const defaultTime = new Date(now.getTime() + MIN_LEAD_TIME_MS);
+  const defaultTime = new Date(now.getTime() + 60 * 1000);
   if (!dateInput.value) {
     dateInput.value = defaultTime.toISOString().split('T')[0];
   }
@@ -204,8 +227,8 @@ function renderPendingEvents() {
         <div class="event-time">${formatDateTime(event.whenMs)}</div>
       </div>
       <div class="event-actions">
-        <button class="btn-edit" onclick="editEvent('${event.id}')">Edit</button>
-        <button class="btn-delete" onclick="deleteEvent('${event.id}')">Delete</button>
+        <button class="btn-edit" data-action="edit" data-id="${event.id}">Edit</button>
+        <button class="btn-delete" data-action="delete" data-id="${event.id}">Delete</button>
       </div>
     </div>
   `).join('');
@@ -236,14 +259,14 @@ function renderCompletedEvents() {
         </div>
       </div>
       <div class="event-actions">
-        <button class="btn-delete" onclick="deleteEvent('${event.id}')">Delete</button>
+        <button class="btn-delete" data-action="delete" data-id="${event.id}">Delete</button>
       </div>
     </div>
   `).join('');
 }
 
 // Event actions
-function editEvent(id) {
+function onEditEvent(id) {
   const event = events.find(e => e.id === id);
   if (!event) return;
   
@@ -261,7 +284,7 @@ function editEvent(id) {
   document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-async function deleteEvent(id) {
+async function onDeleteEvent(id) {
   if (!confirm('Are you sure you want to delete this reminder?')) return;
   
   // Remove from events array
@@ -298,6 +321,4 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Make functions globally available for onclick handlers
-window.editEvent = editEvent;
-window.deleteEvent = deleteEvent;
+// No global exposure needed; using event delegation for CSP compliance

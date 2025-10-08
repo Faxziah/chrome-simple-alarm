@@ -47,7 +47,6 @@ function clearAlarm(eventId) {
 
 // Notification handling
 function showNotification(event) {
-  const title = event.title || "Reminder";
   const whenDate = new Date(event.whenMs);
   const message = whenDate.toLocaleString('en-US', {
     month: 'short',
@@ -61,10 +60,11 @@ function showNotification(event) {
   chrome.notifications.create(event.id, {
     type: "basic",
     iconUrl: "icons/icon48.png",
-    title: title,
+    title: "Simple Alarm: " + (event.title || "Reminder") ,
     message: message,
     requireInteraction: true,
-    priority: 2
+    priority: 2,
+    silent: false
   });
 }
 
@@ -73,15 +73,16 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   const event = await getEventById(alarm.name);
   if (!event || event.status !== 'pending') return;
   
+  // 1. Mark event as completed immediately when alarm fires
+  await updateEventStatus(alarm.name, 'completed', Date.now());
+  
+  // 2. Show notification
   showNotification(event);
-  // Don't delete event here - wait for user to click notification
 });
 
 chrome.notifications.onClicked.addListener(async (notificationId) => {
-  // Mark event as completed
-  await updateEventStatus(notificationId, 'completed', Date.now());
-  
-  // Clear the notification
+  // Event is already marked as completed when alarm fired
+  // Just clear the notification
   chrome.notifications.clear(notificationId);
   
   // Optionally open popup
@@ -104,7 +105,8 @@ async function handleStartup() {
     }
     
     if (event.whenMs <= now) {
-      // Event is overdue - show notification immediately
+      // Event is overdue - mark as completed and show notification immediately
+      await updateEventStatus(event.id, 'completed', now);
       showNotification(event);
     } else {
       // Event is in the future - schedule alarm
