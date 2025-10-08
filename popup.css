@@ -118,6 +118,10 @@ body {
     background: var(--color-text-light);
 }
 
+::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
 /* ===========================
    Header
    =========================== */

@@ -188,10 +188,8 @@ function resetForm() {
 function setMinDateTime() {
   const now = new Date();
   const minDate = now.toISOString().split('T')[0];
-  const minTime = now.toTimeString().slice(0, 5);
   
   dateInput.min = minDate;
-  timeInput.min = minTime;
   
   // Set default to 1 minute from now
   const defaultTime = new Date(now.getTime() + 60 * 1000);
