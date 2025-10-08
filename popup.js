@@ -7,8 +7,6 @@ let currentEditingId = null;
 let events = [];
 
 // DOM elements
-const pendingTab = document.getElementById('pending-tab');
-const completedTab = document.getElementById('completed-tab');
 const pendingEventsList = document.getElementById('pending-events');
 const completedEventsList = document.getElementById('completed-events');
 const eventForm = document.getElementById('event-form');
@@ -40,10 +38,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupEventListeners() {
   // Form submission
   eventForm.addEventListener('submit', handleFormSubmit);
-  
+
   // Cancel button
   cancelBtn.addEventListener('click', cancelEdit);
-  
+
   // Tab switching
   tabButtons.forEach(button => {
     button.addEventListener('click', (e) => {
@@ -81,13 +79,13 @@ function switchTab(tabName) {
   // Update tab buttons
   tabButtons.forEach(btn => btn.classList.remove('active'));
   document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-  
+
   // Update tab content
   document.querySelectorAll('.tab-content').forEach(content => {
     content.classList.remove('active');
   });
   document.getElementById(`${tabName}-tab`).classList.add('active');
-  
+
   // Reset form if switching to pending
   if (tabName === 'pending') {
     resetForm();
@@ -106,37 +104,47 @@ async function loadEvents() {
 
 async function saveEvents() {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ [EVENTS_KEY]: events }, () => resolve());
+    chrome.storage.local.set({[EVENTS_KEY]: events}, () => resolve());
   });
 }
 
 // Form handling
 function handleFormSubmit(e) {
   e.preventDefault();
-  
+
   const title = titleInput.value.trim();
   const date = dateInput.value;
   const time = timeInput.value;
-  
+
   // Validation
   if (!title) {
     alert('Please enter a title');
     return;
   }
-  
+
   if (!date || !time) {
     alert('Please select both date and time');
     return;
   }
-  
+
+  // Check if editing a completed event
+  if (currentEditingId) {
+    const existingEvent = events.find(e => e.id === currentEditingId);
+    if (existingEvent && existingEvent.status === 'completed') {
+      alert('This reminder has already been completed and cannot be edited');
+      resetForm();
+      return;
+    }
+  }
+
   const whenMs = new Date(`${date}T${time}`).getTime();
   const now = Date.now();
-  
+
   if (whenMs <= now) {
     alert('Please select a time in the future');
     return;
   }
-  
+
   // Create or update event
   const eventData = {
     title,
@@ -145,15 +153,15 @@ function handleFormSubmit(e) {
     status: 'pending',
     completedAtMs: null
   };
-  
+
   if (currentEditingId) {
     // Update existing event
     const eventIndex = events.findIndex(e => e.id === currentEditingId);
     if (eventIndex >= 0) {
-      events[eventIndex] = { ...events[eventIndex], ...eventData };
+      events[eventIndex] = {...events[eventIndex], ...eventData};
       // Clear existing alarm and create new one
       chrome.alarms.clear(currentEditingId);
-      chrome.alarms.create(currentEditingId, { when: whenMs });
+      chrome.alarms.create(currentEditingId, {when: whenMs});
     }
   } else {
     // Create new event
@@ -162,9 +170,9 @@ function handleFormSubmit(e) {
       ...eventData
     };
     events.push(newEvent);
-    chrome.alarms.create(newEvent.id, { when: whenMs });
+    chrome.alarms.create(newEvent.id, {when: whenMs});
   }
-  
+
   saveEvents().then(() => {
     resetForm();
     renderEvents();
@@ -187,10 +195,8 @@ function resetForm() {
 
 function setMinDateTime() {
   const now = new Date();
-  const minDate = now.toISOString().split('T')[0];
-  
-  dateInput.min = minDate;
-  
+  dateInput.min = now.toISOString().split('T')[0];
+
   // Set default to 1 minute from now
   const defaultTime = new Date(now.getTime() + 60 * 1000);
   if (!dateInput.value) {
@@ -209,7 +215,7 @@ function renderEvents() {
 
 function renderPendingEvents() {
   const pendingEvents = events.filter(e => e.status === 'pending');
-  
+
   if (pendingEvents.length === 0) {
     pendingEventsList.innerHTML = `
       <div class="empty-state">
@@ -219,10 +225,10 @@ function renderPendingEvents() {
     `;
     return;
   }
-  
+
   // Sort by time
   pendingEvents.sort((a, b) => a.whenMs - b.whenMs);
-  
+
   pendingEventsList.innerHTML = pendingEvents.map(event => `
     <div class="event-item">
       <div class="event-info">
@@ -239,7 +245,7 @@ function renderPendingEvents() {
 
 function renderCompletedEvents() {
   const completedEvents = events.filter(e => e.status === 'completed');
-  
+
   if (completedEvents.length === 0) {
     completedEventsList.innerHTML = `
       <div class="empty-state">
@@ -249,10 +255,10 @@ function renderCompletedEvents() {
     `;
     return;
   }
-  
+
   // Sort by completion time (newest first)
   completedEvents.sort((a, b) => (b.completedAtMs || 0) - (a.completedAtMs || 0));
-  
+
   completedEventsList.innerHTML = completedEvents.map(event => `
     <div class="event-item">
       <div class="event-info">
@@ -272,19 +278,19 @@ function renderCompletedEvents() {
 function onEditEvent(id) {
   const event = events.find(e => e.id === id);
   if (!event) return;
-  
+
   currentEditingId = id;
   titleInput.value = event.title;
-  
+
   const eventDate = new Date(event.whenMs);
   dateInput.value = eventDate.toISOString().split('T')[0];
   timeInput.value = eventDate.toTimeString().slice(0, 5);
-  
+
   saveBtn.textContent = 'Update Reminder';
   cancelBtn.style.display = 'inline-block';
-  
+
   // Scroll to form
-  document.querySelector('body').scrollIntoView({ behavior: 'smooth' });
+  document.querySelector('body').scrollIntoView({behavior: 'smooth'});
 }
 
 async function onDeleteEvent(id) {
@@ -294,13 +300,13 @@ async function onDeleteEvent(id) {
   if (target.status === 'pending') {
     if (!confirm('Are you sure you want to delete this reminder?')) return;
   }
-  
+
   // Remove from events array
   events = events.filter(e => e.id !== id);
-  
+
   // Clear alarm
   chrome.alarms.clear(id);
-  
+
   // Save changes
   await saveEvents();
   renderEvents();
@@ -342,9 +348,17 @@ function getNextAlarmTitle() {
 
 // Message listener for custom alarm sound
 function setupMessageListener() {
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((request) => {
     if (request.action === 'playAlarmSound') {
       playCustomAlarmSound(request.eventTitle);
+    }
+  });
+
+  // Listen for storage changes to update UI when events change status
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes[EVENTS_KEY]) {
+      events = changes[EVENTS_KEY].newValue || [];
+      renderEvents();
     }
   });
 }
@@ -353,42 +367,42 @@ function setupMessageListener() {
 function playCustomAlarmSound(eventTitle) {
   try {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
+
     // Create a more complex alarm sound
     const oscillator1 = audioContext.createOscillator();
     const oscillator2 = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator1.connect(gainNode);
     oscillator2.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     // First beep: 800Hz -> 1000Hz -> 800Hz
     oscillator1.frequency.setValueAtTime(800, audioContext.currentTime);
     oscillator1.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
     oscillator1.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
-    
+
     // Second beep: 600Hz -> 1200Hz -> 600Hz
     oscillator2.frequency.setValueAtTime(600, audioContext.currentTime + 0.3);
     oscillator2.frequency.setValueAtTime(1200, audioContext.currentTime + 0.4);
     oscillator2.frequency.setValueAtTime(600, audioContext.currentTime + 0.5);
-    
+
     // Volume envelope
     gainNode.gain.setValueAtTime(0, audioContext.currentTime);
     gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
     gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
     gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.35);
     gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
-    
+
     oscillator1.start(audioContext.currentTime);
     oscillator1.stop(audioContext.currentTime + 0.2);
-    
+
     oscillator2.start(audioContext.currentTime + 0.3);
     oscillator2.stop(audioContext.currentTime + 0.5);
-    
+
     // Show visual feedback
     showAlarmVisualFeedback(eventTitle);
-    
+
   } catch (error) {
     console.log('Could not play custom alarm sound:', error);
   }
@@ -411,7 +425,7 @@ function showAlarmVisualFeedback(eventTitle) {
     animation: pulse 0.5s ease-in-out 3;
   `;
   indicator.textContent = `🔔 ${eventTitle}`;
-  
+
   // Add pulse animation
   const style = document.createElement('style');
   style.textContent = `
@@ -421,9 +435,9 @@ function showAlarmVisualFeedback(eventTitle) {
     }
   `;
   document.head.appendChild(style);
-  
+
   document.body.appendChild(indicator);
-  
+
   // Remove after 3 seconds
   setTimeout(() => {
     if (indicator.parentNode) {
