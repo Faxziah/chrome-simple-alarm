@@ -1,0 +1,137 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.alarm-container {
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    animation: slideIn 0.3s ease-out;
+    flex-direction: column
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.alarm-icon {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+}
+
+.alarm-content {
+    flex: 1;
+}
+
+.alarm-info h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.alarm-info p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.tools-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.tools-container input[type="button"] {
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tools-container input[type="button"]:hover {
+    background: #0056CC;
+}
+
+.tools-container input[type="button"]:active {
+    transform: translateY(1px);
+}
+
+.tools-container input[type="number"] {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    text-align: center;
+}
+
+.tools-container span {
+    color: #666;
+    font-size: 14px;
+}
+
+#clear {
+    background: #FF3B30;
+}
+
+#clear:hover {
+    background: #D70015;
+}
+
+#done {
+    background: #34C759;
+}
+
+#done:hover {
+    background: #28A745;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .alarm-container {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .tools-container {
+        justify-content: center;
+    }
+}
+

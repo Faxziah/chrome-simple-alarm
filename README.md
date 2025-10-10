@@ -113,3 +113,6 @@ icons/                # Extension icons (16, 32, 48, 128px)
 - None (vanilla JavaScript, no external libraries)
 - Chrome Extensions APIs only
 - No npm packages or build tools required
+
+## GitHub
+https://github.com/Faxziah/chrome-simple-alarm
