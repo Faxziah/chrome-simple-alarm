@@ -195,16 +195,23 @@ function resetForm() {
 
 function setMinDateTime() {
   const now = new Date();
-  dateInput.min = now.toISOString().split('T')[0];
+  dateInput.min = formatDateLocal(now);
 
   // Set default to 1 minute from now
   const defaultTime = new Date(now.getTime() + 60 * 1000);
   if (!dateInput.value) {
-    dateInput.value = defaultTime.toISOString().split('T')[0];
+    dateInput.value = formatDateLocal(defaultTime);
   }
   if (!timeInput.value) {
     timeInput.value = defaultTime.toTimeString().slice(0, 5);
   }
+}
+
+function formatDateLocal(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // Event rendering

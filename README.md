@@ -2,6 +2,10 @@
 
 A minimal Chrome extension for creating one-shot reminders with date and time. Built with Manifest V3, no server required.
 
+**IMPORTANT! IF YOU DO NOT SEE NOTIFICATIONS, PLEASE ENABLE GOOGLE CHROME NOTIFICATIONS IN YOUR PC SETTINGS.**
+
+**THE EXTENSION INCLUDES SOUND ALERTS, AN AUDIO SIGNAL IS PLAYED WHEN THE ALARM TRIGGERS.**
+
 ## Features
 
 - **One-shot reminders**: Create reminders for specific date and time

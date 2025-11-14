@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Simple Alarm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "One-shot reminders with date and time.",
   "permissions": [
     "alarms",

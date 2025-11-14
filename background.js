@@ -45,10 +45,10 @@ function clearAlarm(eventId) {
   chrome.alarms.clear(eventId);
 }
 
-// Alarm popup handling
-function showAlarmPopup(event) {
+// Notification handling
+function showNotification(event) {
   const whenDate = new Date(event.whenMs);
-  const timeString = whenDate.toLocaleString('en-US', {
+  const message = whenDate.toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -57,22 +57,20 @@ function showAlarmPopup(event) {
     hour12: true
   });
   
-  // Create URL with alarm data
-  const popupUrl = chrome.runtime.getURL('alarm-popup.html') + 
-    `?id=${encodeURIComponent(event.id)}` +
-    `&title=${encodeURIComponent(event.title || 'Alarm')}` +
-    `&description=${encodeURIComponent('Simple Alarm')}` +
-    `&time=${encodeURIComponent(timeString)}`;
-  
-  // Open popup window
-  chrome.windows.create({
-    url: popupUrl,
-    type: 'popup',
-    width: 600,
-    height: 300,
-    focused: true,
-    state: 'normal'
+  chrome.notifications.create(event.id, {
+    type: "basic",
+    iconUrl: "icons/icon48.png",
+    title: "Simple Alarm: " + (event.title || "Reminder") ,
+    message: message,
+    requireInteraction: true,
+    priority: 2,
+    silent: true
   });
+  
+  // Ensure offscreen document exists and ask it to play sound
+  ensureOffscreenDocument().then(() => {
+    chrome.runtime.sendMessage({ action: 'offscreen-play-sound' });
+  }).catch(() => {});
 }
 
 // Offscreen document helper
@@ -94,8 +92,8 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   // 1. Mark event as completed immediately when alarm fires
   await updateEventStatus(alarm.name, 'completed', Date.now());
   
-  // 2. Show alarm popup
-  showAlarmPopup(event);
+  // 2. Show notification
+  showNotification(event);
 
   // 3. Sweep any other pending events that are overdue and move them to completed
   await sweepOverduePending(event.id);
@@ -126,9 +124,9 @@ async function handleStartup() {
     }
     
     if (event.whenMs <= now) {
-      // Event is overdue - mark as completed and show alarm popup immediately
+      // Event is overdue - mark as completed and show notification immediately
       await updateEventStatus(event.id, 'completed', now);
-      showAlarmPopup(event);
+      showNotification(event);
     } else {
       // Event is in the future - schedule alarm
       scheduleAlarm(event.id, event.whenMs);
@@ -145,7 +143,7 @@ async function sweepOverduePending(excludeId) {
     if (e.status !== 'pending') continue;
     if (e.whenMs > now) continue;
     await updateEventStatus(e.id, 'completed', now);
-    showAlarmPopup(e);
+    showNotification(e);
   }
 }
 
@@ -153,64 +151,10 @@ async function sweepOverduePending(excludeId) {
 chrome.runtime.onInstalled.addListener(handleStartup);
 chrome.runtime.onStartup.addListener(handleStartup);
 
-// Handle messages from popup and alarm popup
+// Handle messages from popup (if needed)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'getEvents') {
     getEvents().then(sendResponse);
     return true; // Keep message channel open
   }
-  
-  if (request.action === 'snoozeAlarm') {
-    handleSnoozeAlarm(request.alarmId, request.snoozeTime, request.snoozeMinutes);
-    sendResponse({success: true});
-  }
-  
-  if (request.action === 'clearAllSnoozes') {
-    handleClearAllSnoozes(request.alarmId);
-    sendResponse({success: true});
-  }
-  
-  if (request.action === 'dismissAlarm') {
-    handleDismissAlarm(request.alarmId);
-    sendResponse({success: true});
-  }
-  
-  return true;
 });
-
-// Handle snooze alarm
-async function handleSnoozeAlarm(alarmId, snoozeTime, snoozeMinutes) {
-  // Create new alarm for snooze
-  chrome.alarms.create(`${alarmId}_snooze_${Date.now()}`, { when: snoozeTime });
-  
-  // Update event status to pending with new time
-  await updateEventStatus(alarmId, 'pending');
-  const events = await getEvents();
-  const eventIndex = events.findIndex(e => e.id === alarmId);
-  if (eventIndex >= 0) {
-    events[eventIndex].whenMs = snoozeTime;
-    await setEvents(events);
-  }
-}
-
-// Handle clear all snoozes
-async function handleClearAllSnoozes(alarmId) {
-  // Clear all alarms for this event
-  const alarms = await chrome.alarms.getAll();
-  alarms.forEach(alarm => {
-    if (alarm.name.startsWith(alarmId)) {
-      chrome.alarms.clear(alarm.name);
-    }
-  });
-}
-
-// Handle dismiss alarm
-async function handleDismissAlarm(alarmId) {
-  // Clear all alarms for this event
-  const alarms = await chrome.alarms.getAll();
-  alarms.forEach(alarm => {
-    if (alarm.name.startsWith(alarmId)) {
-      chrome.alarms.clear(alarm.name);
-    }
-  });
-}
