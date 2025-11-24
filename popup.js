@@ -290,7 +290,7 @@ function onEditEvent(id) {
   titleInput.value = event.title;
 
   const eventDate = new Date(event.whenMs);
-  dateInput.value = eventDate.toISOString().split('T')[0];
+  dateInput.value = formatDateLocal(eventDate);
   timeInput.value = eventDate.toTimeString().slice(0, 5);
 
   saveBtn.textContent = 'Update Reminder';
